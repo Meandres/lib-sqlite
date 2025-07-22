@@ -40,29 +40,35 @@ $(eval $(call addlib_s,libsqlite,$(CONFIG_LIBSQLITE)))
 ################################################################################
 # Sources
 ################################################################################
-LIBSQLITE_VERSION = 3400100
-LIBSQLITE_BASENAME = sqlite-amalgamation-$(LIBSQLITE_VERSION)
-LIBSQLITE_URL = https://www.sqlite.org/2022/$(LIBSQLITE_BASENAME).zip
-LIBSQLITE_PATCHDIR = $(LIBSQLITE_BASE)/patches
-$(eval $(call fetch,libsqlite,$(LIBSQLITE_URL)))
-$(eval $(call patch,libsqlite,$(LIBSQLITE_PATCHDIR),$(LIBSQLITE_BASENAME)))
+# LIBSQLITE_VERSION = 3400100
+# LIBSQLITE_BASENAME = sqlite-amalgamation-$(LIBSQLITE_VERSION)
+# LIBSQLITE_URL = https://www.sqlite.org/2022/$(LIBSQLITE_BASENAME).zip
+# LIBSQLITE_PATCHDIR = $(LIBSQLITE_BASE)/patches
+# $(eval $(call fetch,libsqlite,$(LIBSQLITE_URL)))
+# $(eval $(call patch,libsqlite,$(LIBSQLITE_PATCHDIR),$(LIBSQLITE_BASENAME)))
 
 ################################################################################
 # Helpers
 ################################################################################
-LIBSQLITE_SRC = $(LIBSQLITE_ORIGIN)/$(LIBSQLITE_BASENAME)
+# LIBSQLITE_SRC = $(LIBSQLITE_ORIGIN)/$(LIBSQLITE_BASENAME)
+LIBSQLITE_SRC = $(LIBSQLITE_BASE)/build/
 
 ################################################################################
 # Library includes
 ################################################################################
-LIBSQLITE_CINCLUDES-y += -I$(LIBSQLITE_BASE)/include
+LIBSQLITE_CINCLUDES-y += -I$(LIBSQLITE_BASE)/../ubpf/vm/inc
+LIBSQLITE_CINCLUDES-y += -I$(LIBSQLITE_BASE)/../ubpf/helpers/include
+LIBSQLITE_CINCLUDES-y += -I$(LIBSQLITE_BASE)/bpf
+LIBSQLITE_CINCLUDES-y += -I$(LIBSQLITE_SRC)
+
+LIBSQLITE_CINCLUDES-y += -I$(LIBSQLITE_SRC)
 CINCLUDES-$(CONFIG_LIBSQLITE) += -I$(LIBSQLITE_SRC)
 CXXINCLUDES-$(CONFIG_LIBSQLITE) += -I$(LIBSQLITE_SRC)
 
 ################################################################################
 # Global flags
 ################################################################################
-LIBSQLITE_FLAGS = -D_HAVE_SQLITE_CONFIG_H -DSQLITE_OMIT_LOAD_EXTENSION
+LIBSQLITE_FLAGS = -D_HAVE_SQLITE_CONFIG_H -DSQLITE_OMIT_LOAD_EXTENSION -DSQLITE_OMIT_JSON
 
 # Suppress some warnings to make the build process look neater
 LIBSQLITE_SUPPRESS_FLAGS-y += -Wno-unused-parameter -Wno-unused-variable		\
@@ -72,6 +78,8 @@ LIBSQLITE_SUPPRESS_FLAGS-$(call gcc_version_ge,7,0) +=-Wimplicit-fallthrough=0		
 
 LIBSQLITE_CFLAGS-y += $(LIBSQLITE_FLAGS)
 LIBSQLITE_CFLAGS-y += $(LIBSQLITE_SUPPRESS_FLAGS-y)
+LIBSQLITE_CXXFLAGS-y += $(LIBSQLITE_FLAGS)
+LIBSQLITE_CXXFLAGS-y += $(LIBSQLITE_SUPPRESS_FLAGS-y)
 
 ################################################################################
 # Glue code
@@ -85,3 +93,4 @@ LIBSQLITE_SHELL_FLAGS-y += -Dmain=sqlite_main -Dwmain=sqlite_main
 
 LIBSQLITE_SRCS-y += $(LIBSQLITE_SRC)/shell.c
 LIBSQLITE_SRCS-y += $(LIBSQLITE_SRC)/sqlite3.c
+LIBSQLITE_SRCS-y += $(LIBSQLITE_SRC)/../bpf/routine.c

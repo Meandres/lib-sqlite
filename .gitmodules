@@ -1,0 +1,3 @@
+[submodule "src"]
+	path = sqlite_src
+	url = git@github.com:Meandres/sqlite.git

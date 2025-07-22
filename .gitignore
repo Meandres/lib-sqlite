@@ -26,3 +26,4 @@ GTAGS
 # cscope files
 cscope.*
 ncscope.*
+build

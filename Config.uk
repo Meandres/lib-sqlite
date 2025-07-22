@@ -1,13 +1,23 @@
+config APP_DEPENDENCIES
+	bool
+	default y
+
 menuconfig LIBSQLITE
     bool "SQLite"
-    default n
+    default y
     imply LIBUKMMAP
     select LIBPOSIX_SYSINFO
     depends on HAVE_LIBC
     select LIBPTHREAD_EMBEDDED
 
 if LIBSQLITE
+
 config LIBSQLITE_MAIN_FUNCTION
     bool "Provide main function"
+    default y
+
+config LIBSQLITE_USE_ROUTINE
+    bool "Use routines"
     default n
+
 endif
